@@ -40,9 +40,11 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 	public void create_widgets() {
 		// コンテナの設定
+		var vbox_header = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+		this.add(vbox_header);
 		var hbox_base = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		hbox_base.margin = 5;
-		this.add(hbox_base);
+		vbox_header.pack_end(hbox_base, true, true, 0);
 
 		var hbox_main = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		var revealer_info = new Gtk.Revealer();
@@ -50,6 +52,19 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		overlay.add(hbox_main);
 		overlay.add_overlay(revealer_info);
 		hbox_base.pack_end(overlay, true, true, 0);
+
+		// HeaderBarの設定
+		var header = new Gtk.HeaderBar();
+		header.decoration_layout = ":close";
+		if (settings.set_titlebar) {
+			header.set_show_close_button(true);
+			header.title = this.title;
+			this.set_titlebar(header);
+		}
+		else {
+			header.title = "";
+			vbox_header.pack_start(header, false, false, 0);
+		}
 
 		// 情報エリアの設定
 		revealer_info.set_reveal_child(false);
