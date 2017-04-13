@@ -28,14 +28,14 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 						SupportedMimeTypes mime_types,
 						AppSettings settings) {
 		Object(application: app);
+		this.image_lists = image_lists;
+		this.mime_types  = mime_types;
+		this.settings    = settings;
 
 		this.title = "TexMag - Texture Magnifier";
 		this.window_position = Gtk.WindowPosition.CENTER;
 		this.set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-		this.image_lists = image_lists;
-		this.mime_types  = mime_types;
-		this.settings    = settings;
+		this.set_keep_above(settings.always_on_top);
 	}
 
 	public void create_widgets() {
