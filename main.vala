@@ -21,8 +21,12 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 	private Gtk.DrawingArea		magnified_area;
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
+	private AppSettings			settings;
 
-	public TexMagWindow(Gtk.Application app, ImageDataLists image_lists, SupportedMimeTypes mime_types) {
+	public TexMagWindow(Gtk.Application app,
+						ImageDataLists image_lists,
+						SupportedMimeTypes mime_types,
+						AppSettings settings) {
 		Object(application: app);
 
 		this.title = "TexMag - Texture Magnifier";
@@ -31,6 +35,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		this.image_lists = image_lists;
 		this.mime_types  = mime_types;
+		this.settings    = settings;
 	}
 
 	public void create_widgets() {
@@ -102,6 +107,7 @@ public class TexMagApplication : Gtk.Application {
 	private TexMagWindow		window;
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
+	private AppSettings			settings;
 
 	public TexMagApplication() {
 		Object(application_id: "app.texmag.texturemagnifier",
@@ -109,11 +115,12 @@ public class TexMagApplication : Gtk.Application {
 
 		this.image_lists = new ImageDataLists();
 		this.mime_types  = new SupportedMimeTypes();
+		this.settings    = new AppSettings();
 	}
 
 	protected override void startup() {
 		base.startup();
-		this.window = new TexMagWindow(this, image_lists, mime_types);
+		this.window = new TexMagWindow(this, image_lists, mime_types, settings);
 		this.window.create_widgets();
 		this.window.show_all();
 	}
@@ -134,6 +141,11 @@ public class TexMagApplication : Gtk.Application {
 		}
 		this.window.select_item(iter);
 		this.window.present();
+	}
+
+	protected override void shutdown() {
+		base.shutdown();
+		this.settings.save_setting();
 	}
 }
 

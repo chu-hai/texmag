@@ -1,5 +1,5 @@
 PROGRAM   = texmag
-SOURCES   = main.vala data_stores.vala thumbnail_frame.vala utils.vala
+SOURCES   = main.vala data_stores.vala thumbnail_frame.vala utils.vala settings.vala
 PKGS      = glib-2.0 gobject-2.0 gtk+-3.0
 VALAFLAGS =
 
