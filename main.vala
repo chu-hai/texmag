@@ -71,6 +71,12 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		btn_show_thumb.image = new Gtk.Image.from_icon_name("view-list-symbolic", Gtk.IconSize.MENU);
 		btn_show_thumb.active = true;
 		header.pack_start(btn_show_thumb);
+		var btn_option_menu = new Gtk.MenuButton();
+		btn_option_menu.image = new Gtk.Image.from_icon_name("emblem-system-symbolic", Gtk.IconSize.MENU);
+		header.pack_end(btn_option_menu);
+
+		// オプションメニューの設定
+		set_option_menu_widgets(btn_option_menu);
 
 		// 情報エリアの設定
 		revealer_info.set_reveal_child(false);
@@ -101,6 +107,63 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		btn_show_thumb.toggled.connect(() => {
 			revealer_thumb.set_reveal_child(btn_show_thumb.active);
 		});
+	}
+
+	private void set_option_menu_widgets(Gtk.MenuButton btn_option) {
+		// 各種Widgetの生成
+		var grid = new Gtk.Grid();
+		grid.column_spacing = 15;
+		grid.row_spacing = 15;
+		grid.margin = 20;
+
+		var lbl_always_on_top = new Gtk.Label("Always on Top:");
+		lbl_always_on_top.halign = Gtk.Align.END;
+		grid.attach(lbl_always_on_top, 0, 0);
+		var sw_always_on_top = new Gtk.Switch();
+		grid.attach(sw_always_on_top, 1, 0);
+
+		var lbl_auto_reload = new Gtk.Label("Automatic Reload:");
+		lbl_auto_reload.halign = Gtk.Align.END;
+		grid.attach(lbl_auto_reload, 0, 1);
+		var sw_auto_reload = new Gtk.Switch();
+		grid.attach(sw_auto_reload, 1, 1);
+
+		var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+		grid.attach(separator, 0, 2, 2);
+
+		var lbl_set_titlebar = new Gtk.Label("Use HeaderBar as TitleBar:");
+		lbl_set_titlebar.halign = Gtk.Align.END;
+		grid.attach(lbl_set_titlebar, 0, 3);
+		var sw_set_titlebar = new Gtk.Switch();
+		grid.attach(sw_set_titlebar, 1, 3);
+
+		var lbl_titlebar_warn = new Gtk.Label("<span font_weight=\"bold\">This changes take effect after restart.</span>");
+		lbl_titlebar_warn.set_use_markup(true);
+		grid.attach(lbl_titlebar_warn, 0, 4, 2);
+
+		var popover = new Gtk.PopoverMenu();
+		popover.add(grid);
+		grid.show_all();
+		btn_option.set_popover(popover);
+
+		// シグナルハンドラの設定
+ 		btn_option.clicked.connect(() => {
+			if (btn_option.active == true) {
+				sw_always_on_top.active = this.settings.always_on_top;
+				sw_auto_reload.active   = this.settings.auto_reload;
+				sw_set_titlebar.active  = this.settings.set_titlebar;
+			}
+ 		});
+		sw_always_on_top.notify["active"].connect(() => {
+			this.settings.always_on_top = sw_always_on_top.active;
+			this.set_keep_above(this.settings.always_on_top);
+ 		});
+		sw_auto_reload.notify["active"].connect(() => {
+			this.settings.auto_reload = sw_auto_reload.active;
+ 		});
+		sw_set_titlebar.notify["active"].connect(() => {
+			this.settings.set_titlebar = sw_set_titlebar.active;
+ 		});
 	}
 
 	public void select_item(Gtk.TreeIter? iter) {
