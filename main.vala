@@ -66,6 +66,12 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 			vbox_header.pack_start(header, false, false, 0);
 		}
 
+		// HeaderBarへボタンを登録
+		var btn_show_thumb = new Gtk.ToggleButton();
+		btn_show_thumb.image = new Gtk.Image.from_icon_name("view-list-symbolic", Gtk.IconSize.MENU);
+		btn_show_thumb.active = true;
+		header.pack_start(btn_show_thumb);
+
 		// 情報エリアの設定
 		revealer_info.set_reveal_child(false);
 		revealer_info.set_transition_type(Gtk.RevealerTransitionType.SLIDE_UP);
@@ -92,6 +98,9 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		// シグナルハンドラの設定
 		magnified_area.draw.connect(on_magnified_area_draw);
+		btn_show_thumb.toggled.connect(() => {
+			revealer_thumb.set_reveal_child(btn_show_thumb.active);
+		});
 	}
 
 	public void select_item(Gtk.TreeIter? iter) {
