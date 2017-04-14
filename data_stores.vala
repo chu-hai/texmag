@@ -20,9 +20,9 @@ public class ImageDataLists : GLib.Object {
 	private Gdk.Pixbuf		_selected_pixbuf;
 	private string			_selected_filepath;
 
-	public Gtk.ListStore 	model 				{ get {return _model;} }
-	public Gdk.Pixbuf		selected_pixbuf		{ get {return _selected_pixbuf;} }
-	public string			selected_filepath	{ get {return _selected_filepath;} }
+	public Gtk.ListStore 	model 				{ get {return this._model;} }
+	public Gdk.Pixbuf		selected_pixbuf		{ get {return this._selected_pixbuf;} }
+	public string			selected_filepath	{ get {return this._selected_filepath;} }
 
 	public ImageDataLists() {
 		this._model = new Gtk.ListStore(2, typeof (Gdk.Pixbuf),	// アイコン用画像データ
@@ -104,24 +104,24 @@ public class SupportedMimeTypes: GLib.Object {
 	private GLib.HashTable<string, Gdk.PixbufFormat> format_lists;
 
 	public SupportedMimeTypes() {
-		format_lists = new GLib.HashTable<string, Gdk.PixbufFormat> (GLib.str_hash, GLib.str_equal);
+		this.format_lists = new GLib.HashTable<string, Gdk.PixbufFormat> (GLib.str_hash, GLib.str_equal);
 
 		foreach(var format in Gdk.Pixbuf.get_formats()) {
 			foreach(var mime in format.get_mime_types()) {
 				if (format.is_disabled() == false) {
-					format_lists.insert(mime, format);
+					this.format_lists.insert(mime, format);
 				}
 			}
 		}
 	}
 
 	public bool is_supported(string mine_type) {
-		return format_lists.lookup(mine_type) != null;
+		return this.format_lists.lookup(mine_type) != null;
 	}
 
 	public string[] get_all() {
 		string[] result = {};
-		foreach(string mime in format_lists.get_keys()) {
+		foreach(string mime in this.format_lists.get_keys()) {
 			result += mime;
 		}
 		return result;

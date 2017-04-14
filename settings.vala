@@ -50,9 +50,9 @@ public class AppSettings : GLib.Object {
 			return;
 		}
 
-		keyfile.set_boolean("settings", "set_titlebar",  set_titlebar);
-		keyfile.set_boolean("settings", "auto_reload",	 auto_reload);
-		keyfile.set_boolean("settings", "always_on_top", always_on_top);
+		this.keyfile.set_boolean("settings", "set_titlebar",  set_titlebar);
+		this.keyfile.set_boolean("settings", "auto_reload",	 auto_reload);
+		this.keyfile.set_boolean("settings", "always_on_top", always_on_top);
 		try {
 			this.keyfile.save_to_file(this.filepath);
 		} catch (Error e) {

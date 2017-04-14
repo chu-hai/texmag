@@ -54,12 +54,12 @@ public class ThumbnailFrame : Gtk.Frame {
 		this.btn_remove.sensitive = false;
 		hbox_footer_inner.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED);
 		hbox_footer_inner.pack_start(btn_open, false, false, 0);
-		hbox_footer_inner.pack_start(btn_remove, false, false, 0);
+		hbox_footer_inner.pack_start(this.btn_remove, false, false, 0);
 
 		// シグナルハンドラの設定
 		btn_open.clicked.connect(on_open_clicked);
-		btn_remove.clicked.connect(on_remove_clicked);
-		iconview.selection_changed.connect(on_selection_changed);
+		this.btn_remove.clicked.connect(on_remove_clicked);
+		this.iconview.selection_changed.connect(on_selection_changed);
 	}
 
 	public void select_item(Gtk.TreeIter? iter) {
@@ -138,8 +138,8 @@ private class ImageFileOpenDialog : GLib.Object {
 	private Gtk.FileChooserDialog	dialog;
 
 	public bool select_multiple {
-		set { dialog.select_multiple = value; }
-		get { return dialog.select_multiple; }
+		set { this.dialog.select_multiple = value; }
+		get { return this.dialog.select_multiple; }
 	}
 
 	public ImageFileOpenDialog(Gtk.Window parent, SupportedMimeTypes mime_types) {

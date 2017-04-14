@@ -35,7 +35,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		this.title = "TexMag - Texture Magnifier";
 		this.window_position = Gtk.WindowPosition.CENTER;
 		this.set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
-		this.set_keep_above(settings.always_on_top);
+		this.set_keep_above(this.settings.always_on_top);
 	}
 
 	public void create_widgets() {
@@ -56,7 +56,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		// HeaderBarの設定
 		var header = new Gtk.HeaderBar();
 		header.decoration_layout = ":close";
-		if (settings.set_titlebar) {
+		if (this.settings.set_titlebar) {
 			header.set_show_close_button(true);
 			header.title = this.title;
 			this.set_titlebar(header);
@@ -90,14 +90,14 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		hbox_base.pack_start(revealer_thumb, false, false, 0);
 
 		// 拡大エリアの設定
-		magnified_area = new Gtk.DrawingArea();
-		magnified_area.margin = 10;
+		this.magnified_area = new Gtk.DrawingArea();
+		this.magnified_area.margin = 10;
 		var frame_magnified_area = new Gtk.Frame(null);
-		frame_magnified_area.add(magnified_area);
+		frame_magnified_area.add(this.magnified_area);
 		hbox_main.pack_start(frame_magnified_area, true, true, 0);
 
 		// シグナルハンドラの設定
-		magnified_area.draw.connect(on_magnified_area_draw);
+		this.magnified_area.draw.connect(on_magnified_area_draw);
 		btn_show_thumb.toggled.connect(() => {
 			revealer_thumb.set_reveal_child(btn_show_thumb.active);
 		});
@@ -108,15 +108,15 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 	}
 
 	public void update_magnified_area() {
-		magnified_area.queue_draw();
+		this.magnified_area.queue_draw();
 	}
 
 	private bool on_magnified_area_draw(Cairo.Context context) {
 		if (this.image_lists.selected_pixbuf == null) {
 			return true;
 		}
-		int dest_height = magnified_area.get_allocated_height();
-		int dest_width  = magnified_area.get_allocated_width();
+		int dest_height = this.magnified_area.get_allocated_height();
+		int dest_width  = this.magnified_area.get_allocated_width();
 
 		draw_scaled_image(context, this.image_lists.selected_pixbuf, dest_width, dest_height);
 		return true;
