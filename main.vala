@@ -88,7 +88,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		revealer_info.add(frame_info);
 
 		// サムネイルフレームの設定
-		this.frame_thumb = new ThumbnailFrame(this, image_lists, mime_types);
+		this.frame_thumb = new ThumbnailFrame(this, image_lists, mime_types, settings);
 		var revealer_thumb = new Gtk.Revealer();
 		revealer_thumb.set_reveal_child(true);
 		revealer_thumb.set_transition_type(Gtk.RevealerTransitionType.SLIDE_LEFT);
@@ -160,6 +160,11 @@ public class TexMagWindow : Gtk.ApplicationWindow {
  		});
 		sw_auto_reload.notify["active"].connect(() => {
 			this.settings.auto_reload = sw_auto_reload.active;
+			Gtk.TreeIter? iter;
+			if (this.frame_thumb.get_selected_iter(out iter) == true) {
+				this.image_lists.refresh(iter);
+				this.frame_thumb.select_item(iter, true);
+			}
  		});
 		sw_set_titlebar.notify["active"].connect(() => {
 			this.settings.set_titlebar = sw_set_titlebar.active;

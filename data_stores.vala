@@ -57,7 +57,6 @@ public class ImageDataLists : GLib.Object {
 			this._selected_pixbuf   = new Gdk.Pixbuf.from_file(filepath);
 			this._selected_filepath = filepath;
 		} catch (Error e) {
-			stderr.printf("%s\n", e.message);
 			return false;
 		}
 		return true;
@@ -69,7 +68,18 @@ public class ImageDataLists : GLib.Object {
 		return this._model.remove(iter);
 	}
 
-	private string get_filepath(Gtk.TreeIter iter) {
+	public bool refresh(Gtk.TreeIter iter) {
+		try {
+			string filepath = get_filepath(iter);
+			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
+			this._model.set(iter, 0, pixbuf);
+		} catch (Error e) {
+			return false;
+		}
+		return true;
+	}
+
+	public string get_filepath(Gtk.TreeIter iter) {
 		GLib.Value v_filepath;
 		this._model.get_value(iter, 1, out v_filepath);
 

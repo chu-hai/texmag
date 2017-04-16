@@ -21,11 +21,17 @@ public class ThumbnailFrame : Gtk.Frame {
 	private Gtk.Button			btn_remove;
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
+	private AppSettings			settings;
+	private ImageFileMonitor	file_monitor;
 
-	public ThumbnailFrame(TexMagWindow window, ImageDataLists image_lists, SupportedMimeTypes mime_types) {
-		this.window = window;
+	public ThumbnailFrame(TexMagWindow window,
+						  ImageDataLists image_lists,
+						  SupportedMimeTypes mime_types,
+						  AppSettings settings) {
+		this.window      = window;
 		this.image_lists = image_lists;
-		this.mime_types = mime_types;
+		this.mime_types  = mime_types;
+		this.settings    = settings;
 
 		// 子ウィジェットの設定
 		var vbox_base = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -60,17 +66,37 @@ public class ThumbnailFrame : Gtk.Frame {
 		btn_open.clicked.connect(on_open_clicked);
 		this.btn_remove.clicked.connect(on_remove_clicked);
 		this.iconview.selection_changed.connect(on_selection_changed);
+
+		// ファイル監視の設定
+		this.file_monitor = new ImageFileMonitor();
+		this.file_monitor.changed.connect(on_file_changed);
+		this.file_monitor.removed.connect(on_file_removed);
 	}
 
-	public void select_item(Gtk.TreeIter? iter) {
+	public void select_item(Gtk.TreeIter? iter, bool force_update = false) {
 		if (iter != null) {
-			if (this.image_lists.select(iter)) {
+			if ((this.image_lists.get_filepath(iter) == this.image_lists.selected_filepath)
+			&&  (force_update == false)) {
+				return;
+			}
+			if (this.image_lists.select(iter) == true) {
 				Gtk.TreePath path = this.image_lists.model.get_path(iter);
 				this.iconview.scroll_to_path(path, false, 0, 0);
 				this.iconview.set_cursor(path, null, false);
 				this.iconview.select_path(path);
+
+				if (this.settings.auto_reload == true) {
+					this.file_monitor.set_filemonitor(this.image_lists.selected_filepath);
+				}
+				else {
+					this.file_monitor.reset_filemonitor();
+				}
 			}
 		}
+		else {
+			this.file_monitor.reset_filemonitor();
+		}
+
 		this.window.update_magnified_area();
 
 		if (this.image_lists.model.iter_n_children(null) == 0) {
@@ -79,6 +105,16 @@ public class ThumbnailFrame : Gtk.Frame {
 		else {
 			this.btn_remove.sensitive = true;
 		}
+	}
+
+	public bool get_selected_iter(out Gtk.TreeIter? iter) {
+		bool result = false;
+		iter = null;
+		Gtk.TreePath path = this.iconview.get_selected_items().nth_data(0);
+		if (path != null) {
+			result = this.image_lists.model.get_iter(out iter, path);
+		}
+		return result;
 	}
 
 	private void on_open_clicked() {
@@ -100,32 +136,42 @@ public class ThumbnailFrame : Gtk.Frame {
 	}
 
 	private void on_remove_clicked() {
-		Gtk.TreePath path = this.iconview.get_selected_items().nth_data(0);
-		if (path != null) {
-			Gtk.TreeIter? iter;
-			Gtk.TreeIter? after_iter;
-			if (this.image_lists.model.get_iter(out iter, path)) {
+		Gtk.TreeIter? iter;
+		Gtk.TreeIter? after_iter;
+		if (get_selected_iter(out iter) == true) {
+			after_iter = iter;
+			if (this.image_lists.model.iter_next(ref after_iter) == false) {
 				after_iter = iter;
-				if (this.image_lists.model.iter_next(ref after_iter) == false) {
-					after_iter = iter;
-					if (this.image_lists.model.iter_previous(ref after_iter) == false) {
-						after_iter = null;
-					}
+				if (this.image_lists.model.iter_previous(ref after_iter) == false) {
+					after_iter = null;
 				}
-
-				this.image_lists.remove(iter);
-				select_item(after_iter);
 			}
+
+			this.image_lists.remove(iter);
+			select_item(after_iter);
 		}
 	}
 
 	private void on_selection_changed() {
-		Gtk.TreePath path = this.iconview.get_selected_items().nth_data(0);
-		if (path != null) {
-			Gtk.TreeIter iter;
-			if (this.image_lists.model.get_iter(out iter, path)) {
-				select_item(iter);
+		Gtk.TreeIter? iter;
+		if (get_selected_iter(out iter) == true) {
+			select_item(iter);
+		}
+	}
+
+	private void on_file_changed(string filepath) {
+		if (this.image_lists.selected_filepath == filepath) {
+			Gtk.TreeIter? iter;
+			if (get_selected_iter(out iter) == true) {
+				this.image_lists.refresh(iter);
+				select_item(iter, true);
 			}
+		}
+	}
+
+	private void on_file_removed(string filepath) {
+		if (this.image_lists.selected_filepath == filepath) {
+			on_remove_clicked();
 		}
 	}
 }
