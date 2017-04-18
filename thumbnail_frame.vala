@@ -98,6 +98,7 @@ public class ThumbnailFrame : Gtk.Frame {
 		}
 
 		this.window.update_magnified_area();
+		this.window.update_title_string();
 
 		if (this.image_lists.model.iter_n_children(null) == 0) {
 			this.btn_remove.sensitive = false;

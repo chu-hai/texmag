@@ -16,7 +16,9 @@
 public class TexMagWindow : Gtk.ApplicationWindow {
 	private const int WINDOW_WIDTH = 640;
 	private const int WINDOW_HEIGHT = 480;
+	private const string DEFAULT_TITLE = "TexMag - Texture Magnifier";
 
+	private Gtk.HeaderBar		header;
 	private ThumbnailFrame		frame_thumb;
 	private Gtk.DrawingArea		magnified_area;
 	private ImageDataLists		image_lists;
@@ -32,7 +34,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		this.mime_types  = mime_types;
 		this.settings    = settings;
 
-		this.title = "TexMag - Texture Magnifier";
+		this.title = DEFAULT_TITLE;
 		this.window_position = Gtk.WindowPosition.CENTER;
 		this.set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
 		this.set_keep_above(this.settings.always_on_top);
@@ -54,7 +56,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		hbox_base.pack_end(overlay, true, true, 0);
 
 		// HeaderBarの設定
-		var header = new Gtk.HeaderBar();
+		this.header = new Gtk.HeaderBar();
 		header.decoration_layout = ":close";
 		if (this.settings.set_titlebar) {
 			header.set_show_close_button(true);
@@ -177,6 +179,18 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 	public void update_magnified_area() {
 		this.magnified_area.queue_draw();
+	}
+
+	public void update_title_string() {
+		string filepath = this.image_lists.selected_filepath;
+		if (filepath != "") {
+			this.header.title    = GLib.Path.get_basename(filepath);
+			this.header.subtitle = GLib.Path.get_dirname(filepath);
+		}
+		else {
+			this.header.title    = DEFAULT_TITLE;
+			this.header.subtitle = null;
+		}
 	}
 
 	private bool on_magnified_area_draw(Cairo.Context context) {
