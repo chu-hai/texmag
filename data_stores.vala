@@ -25,8 +25,9 @@ public class ImageDataLists : GLib.Object {
 	public string			selected_filepath	{ get {return this._selected_filepath;} }
 
 	public ImageDataLists() {
-		this._model = new Gtk.ListStore(2, typeof (Gdk.Pixbuf),	// アイコン用画像データ
-										   typeof (string));	// 画像ファイルパス
+		this._model = new Gtk.ListStore(3, typeof (Gdk.Pixbuf),	// アイコン用画像データ
+										   typeof (string),		// 画像ファイルパス
+										   typeof (string));	// 更新日時
 	}
 
 	public Gtk.TreeIter? load_image(string image_filepath) {
@@ -37,8 +38,9 @@ public class ImageDataLists : GLib.Object {
 
 		try {
 			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(image_filepath), ICON_SIZE, ICON_SIZE);
+			var stamp = get_timestamp(image_filepath);
 			this._model.append(out iter);
-			this._model.set(iter, 0, pixbuf, 1, image_filepath);
+			this._model.set(iter, 0, pixbuf, 1, image_filepath, 2, stamp);
 		} catch (Error e) {
 			stderr.printf("%s\n", e.message);
 			return null;
@@ -56,6 +58,13 @@ public class ImageDataLists : GLib.Object {
 		try {
 			this._selected_pixbuf   = new Gdk.Pixbuf.from_file(filepath);
 			this._selected_filepath = filepath;
+
+			var cur_stamp = get_timestamp(filepath);
+			GLib.Value v_stamp;
+			this._model.get_value(iter, 2, out v_stamp);
+			if (cur_stamp != (string)v_stamp) {
+				refresh(iter);
+			}
 		} catch (Error e) {
 			return false;
 		}
@@ -72,7 +81,8 @@ public class ImageDataLists : GLib.Object {
 		try {
 			string filepath = get_filepath(iter);
 			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
-			this._model.set(iter, 0, pixbuf);
+			var stamp = get_timestamp(filepath);
+			this._model.set(iter, 0, pixbuf, 2, stamp);
 		} catch (Error e) {
 			return false;
 		}
@@ -102,6 +112,23 @@ public class ImageDataLists : GLib.Object {
 		});
 
 		iter = result_iter;
+		return result;
+	}
+
+	private string get_timestamp(string filepath) {
+		string result = "n/a";
+		try {
+			var file = GLib.File.new_for_path(filepath);
+			if (file.query_exists ()) {
+				var info = file.query_info("standard::content-type,time::modified",
+											GLib.FileQueryInfoFlags.NONE,
+											null);
+				var mod_time = info.get_modification_time();
+				result = mod_time.to_iso8601();
+			}
+		} catch (Error e) {
+			stdout.printf ("Error: %s\n", e.message);
+		}
 		return result;
 	}
 }
