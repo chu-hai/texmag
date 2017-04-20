@@ -1,5 +1,6 @@
 PROGRAM   = texmag
 SOURCES   = main.vala data_stores.vala thumbnail_frame.vala utils.vala settings.vala image_file_monitor.vala
+RESOURCES = resources.xml
 PKGS      = glib-2.0 gobject-2.0 gtk+-3.0 gio-2.0
 VALAFLAGS =
 
@@ -15,12 +16,16 @@ FASTVAPI_STAMP = $(foreach f, $(BASENAMES), $(WORK_DIR)$(f).vapi.stamp)
 C_FILES        = $(foreach f, $(BASENAMES), $(WORK_DIR)$(f).c)
 OBJ_FILES      = $(foreach f, $(BASENAMES), $(WORK_DIR)$(f).o)
 
-.PRECIOUS: $(WORK_DIR)%.vapi $(WORK_DIR)%.vapi.stamp $(WORK_DIR)%.dep $(WORK_DIR)%.c $(WORK_DIR)%.o
+RES_BASENAMES  = $(notdir $(basename $(RESOURCES)))
+RES_OBJ_FILES  = $(foreach f, $(RES_BASENAMES), $(WORK_DIR)$(f).o)
+
+.PRECIOUS: $(WORK_DIR)%.vapi $(WORK_DIR)%.vapi.stamp $(WORK_DIR)%.dep \
+		   $(WORK_DIR)%.c $(WORK_DIR)%.res.c $(WORK_DIR)%.o
 
 .PHONY: all
 all: $(PROGRAM)
 
-$(PROGRAM): $(OBJ_FILES)
+$(PROGRAM): $(OBJ_FILES) $(RES_OBJ_FILES)
 	@echo '  BUILD '$@
 	@$(CC) -o $@ $(_LDFLAGS) $^
 
@@ -39,6 +44,15 @@ $(WORK_DIR)%.o: $(WORK_DIR)%.c | $(FASTVAPI_STAMP)
 	@echo '  GEN   '$@
 	@$(VALAC) -c $(_VFLAGS) $(WORK_DIR)$*.c
 	@mv $*.o $(WORK_DIR)
+
+$(WORK_DIR)%.res.c: %.xml
+	@echo '  GEN   '$@
+	@glib-compile-resources --generate-source --target $(WORK_DIR)$*.res.c $<
+
+$(WORK_DIR)%.o: $(WORK_DIR)%.res.c
+	@echo '  GEN   '$@
+	@$(VALAC) -c $(_VFLAGS) $(WORK_DIR)$*.res.c
+	@mv $*.res.o $@
 
 $(WORK_DIR):
 	@mkdir -p $(WORK_DIR)

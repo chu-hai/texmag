@@ -38,6 +38,12 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		this.window_position = Gtk.WindowPosition.CENTER;
 		this.set_default_size(WINDOW_WIDTH, WINDOW_HEIGHT);
 		this.set_keep_above(this.settings.always_on_top);
+
+		try {
+			this.icon = new Gdk.Pixbuf.from_resource(app.resource_base_path + "/resources/appli_icon.png");
+		} catch (Error e) {
+			stderr.printf ("Could not load application icon: %s\n", e.message);
+		}
 	}
 
 	public void create_widgets() {

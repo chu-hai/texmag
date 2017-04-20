@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/app/texmag/texturemagnifier">
+		<file compressed="true">resources/appli_icon.png</file>
+	</gresource>
+</gresources>
