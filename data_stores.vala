@@ -16,6 +16,8 @@
 public class ImageDataLists : GLib.Object {
 	private const int ICON_SIZE = 64;
 
+	private Gdk.Pixbuf?		unavailable_icon = null;
+
 	private Gtk.ListStore	_model;
 	private Gdk.Pixbuf		_selected_pixbuf;
 	private string			_selected_filepath;
@@ -28,6 +30,10 @@ public class ImageDataLists : GLib.Object {
 		this._model = new Gtk.ListStore(3, typeof (Gdk.Pixbuf),	// アイコン用画像データ
 										   typeof (string),		// 画像ファイルパス
 										   typeof (string));	// 更新日時
+	}
+
+	public void set_unavailable_icon(Gdk.Pixbuf icon) {
+		unavailable_icon = icon;
 	}
 
 	public Gtk.TreeIter? load_image(string image_filepath) {
@@ -50,8 +56,10 @@ public class ImageDataLists : GLib.Object {
 
 	public bool select(Gtk.TreeIter iter) {
 		var filepath = get_filepath(iter);
-		if (FileUtils.test(filepath, GLib.FileTest.EXISTS) == false) {
-			stderr.printf("%s is not exists.\n", filepath);
+		if (is_file_exists(filepath) == false) {
+			disable(iter);
+			this._selected_pixbuf   = null;
+			this._selected_filepath = "";
 			return false;
 		}
 
@@ -80,13 +88,37 @@ public class ImageDataLists : GLib.Object {
 	public bool refresh(Gtk.TreeIter iter) {
 		try {
 			string filepath = get_filepath(iter);
-			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
-			var stamp = get_timestamp(filepath);
-			this._model.set(iter, 0, pixbuf, 2, stamp);
+			if (is_file_exists(filepath) == true) {
+				var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
+				var stamp = get_timestamp(filepath);
+				this._model.set(iter, 0, pixbuf, 2, stamp);
+			}
+			else {
+				disable(iter);
+			}
 		} catch (Error e) {
 			return false;
 		}
 		return true;
+	}
+
+	public void disable(Gtk.TreeIter iter) {
+		if (unavailable_icon == null) {
+			return;
+		}
+
+		GLib.Value v_pixbuf;
+		this._model.get_value(iter, 0, out v_pixbuf);
+		var pixbuf = (Gdk.Pixbuf)v_pixbuf;
+
+		int dest_width  = pixbuf.width;
+		int dest_height = pixbuf.height;
+		int dest_x = (dest_width  - unavailable_icon.width)  / 2;
+		int dest_y = (dest_height - unavailable_icon.height) / 2;
+
+		unavailable_icon.composite(pixbuf, 0, 0, dest_width, dest_height,
+								   dest_x, dest_y, 1, 1, Gdk.InterpType.NEAREST, 255);
+		this._model.set(iter, 0, pixbuf);
 	}
 
 	public string get_filepath(Gtk.TreeIter iter) {

@@ -37,3 +37,7 @@ public void draw_scaled_image(Cairo.Context context, Gdk.Pixbuf src_pixbuf, int 
 	context.set_source(pattern);
 	context.paint();
 }
+
+public bool is_file_exists(string filepath) {
+	return FileUtils.test(filepath, GLib.FileTest.EXISTS);
+}

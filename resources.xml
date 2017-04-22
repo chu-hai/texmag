@@ -2,5 +2,6 @@
 <gresources>
 	<gresource prefix="/app/texmag/texturemagnifier">
 		<file compressed="true">resources/appli_icon.png</file>
+		<file compressed="true">resources/unavailable_image.png</file>
 	</gresource>
 </gresources>

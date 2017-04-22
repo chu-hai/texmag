@@ -172,7 +172,11 @@ public class ThumbnailFrame : Gtk.Frame {
 
 	private void on_file_removed(string filepath) {
 		if (this.image_lists.selected_filepath == filepath) {
-			on_remove_clicked();
+			Gtk.TreeIter? iter;
+			if (get_selected_iter(out iter) == true) {
+				this.image_lists.disable(iter);
+				select_item(iter, true);
+			}
 		}
 	}
 }
