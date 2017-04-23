@@ -191,7 +191,10 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 	public void update_title_string() {
 		string filepath = this.image_lists.selected_filepath;
 		if (filepath != "") {
-			this.header.title    = GLib.Path.get_basename(filepath);
+			int width  = this.image_lists.selected_pixbuf.width;
+			int height = this.image_lists.selected_pixbuf.height;
+
+			this.header.title    = "%s (%dx%d)".printf(GLib.Path.get_basename(filepath), width, height);
 			this.header.subtitle = GLib.Path.get_dirname(filepath);
 		}
 		else {
