@@ -28,15 +28,15 @@ public class ImageFileMonitor : GLib.Object {
 	}
 
 	~ImageFileMonitor() {
-		reset_filemonitor();
+		stop_filemonitor();
 	}
 
-	public void set_filemonitor(string filepath) {
+	public void start_filemonitor(string filepath) {
 		if (filepath == this.filepath) {
 			return;
 		}
 
-		reset_filemonitor();
+		stop_filemonitor();
 		this.filepath = filepath;
 		try {
 			this.file_monitor = GLib.File.new_for_path(this.filepath).monitor(GLib.FileMonitorFlags.NONE, null);
@@ -46,7 +46,7 @@ public class ImageFileMonitor : GLib.Object {
 		}
 	}
 
-	public void reset_filemonitor() {
+	public void stop_filemonitor() {
 		if (this.file_monitor != null) {
 			file_monitor.cancel();
 			file_monitor.changed.disconnect(on_filemonitor_changed);

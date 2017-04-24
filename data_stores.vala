@@ -39,7 +39,7 @@ public class ImageDataLists : GLib.Object {
 
 	public Gtk.TreeIter? load_image(string image_filepath) {
 		Gtk.TreeIter? iter;
-		if (is_exist(image_filepath, out iter)){
+		if (is_exists(image_filepath, out iter)){
 			return iter;
 		}
 
@@ -137,7 +137,7 @@ public class ImageDataLists : GLib.Object {
 		return (bool)v_available;
 	}
 
-	private bool is_exist(string filepath, out Gtk.TreeIter? iter = null) {
+	private bool is_exists(string filepath, out Gtk.TreeIter? iter = null) {
 		Gtk.TreeIter? result_iter = null;
 		bool result = false;
 
@@ -168,7 +168,7 @@ public class ImageDataLists : GLib.Object {
 				result = mod_time.to_iso8601();
 			}
 		} catch (Error e) {
-			stdout.printf ("Error: %s\n", e.message);
+			stderr.printf ("Error: %s\n", e.message);
 		}
 		return result;
 	}

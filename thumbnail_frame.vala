@@ -89,10 +89,10 @@ public class ThumbnailFrame : Gtk.Frame {
 		}
 
 		if ((this.settings.auto_reload == true) && (iter != null)) {
-			this.file_monitor.set_filemonitor(this.image_lists.selected_filepath);
+			this.file_monitor.start_filemonitor(this.image_lists.selected_filepath);
 		}
 		else {
-			this.file_monitor.reset_filemonitor();
+			this.file_monitor.stop_filemonitor();
 		}
 
 		this.window.update_magnified_area();
