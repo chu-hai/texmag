@@ -5,6 +5,7 @@ PKGS      = glib-2.0 gobject-2.0 gtk+-3.0 gio-2.0
 VALAFLAGS =
 
 WORK_DIR  = .vala_work/
+RES_DIR   = resources/
 VALAC     = valac
 
 _VFLAGS   = $(VALAFLAGS) $(addprefix --pkg , $(PKGS))
@@ -18,6 +19,7 @@ OBJ_FILES      = $(foreach f, $(BASENAMES), $(WORK_DIR)$(f).o)
 
 RES_BASENAMES  = $(notdir $(basename $(RESOURCES)))
 RES_OBJ_FILES  = $(foreach f, $(RES_BASENAMES), $(WORK_DIR)$(f).o)
+RES_DATA_FILES = $(wildcard $(RES_DIR)/*)
 
 .PRECIOUS: $(WORK_DIR)%.vapi $(WORK_DIR)%.vapi.stamp $(WORK_DIR)%.dep \
 		   $(WORK_DIR)%.c $(WORK_DIR)%.res.c $(WORK_DIR)%.o
@@ -45,7 +47,7 @@ $(WORK_DIR)%.o: $(WORK_DIR)%.c | $(FASTVAPI_STAMP)
 	@$(VALAC) -c $(_VFLAGS) $(WORK_DIR)$*.c
 	@mv $*.o $(WORK_DIR)
 
-$(WORK_DIR)%.res.c: %.xml
+$(WORK_DIR)%.res.c: %.xml $(RES_DATA_FILES)
 	@echo '  GEN   '$@
 	@glib-compile-resources --generate-source --target $(WORK_DIR)$*.res.c $<
 
