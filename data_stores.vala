@@ -27,9 +27,10 @@ public class ImageDataLists : GLib.Object {
 	public string			selected_filepath	{ get {return this._selected_filepath;} }
 
 	public ImageDataLists() {
-		this._model = new Gtk.ListStore(3, typeof (Gdk.Pixbuf),	// アイコン用画像データ
+		this._model = new Gtk.ListStore(4, typeof (Gdk.Pixbuf),	// アイコン用画像データ
 										   typeof (string),		// 画像ファイルパス
-										   typeof (string));	// 更新日時
+										   typeof (string),		// 更新日時
+										   typeof (bool));		// 有効フラグ
 	}
 
 	public void set_unavailable_icon(Gdk.Pixbuf icon) {
@@ -46,7 +47,7 @@ public class ImageDataLists : GLib.Object {
 			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(image_filepath), ICON_SIZE, ICON_SIZE);
 			var stamp = get_timestamp(image_filepath);
 			this._model.append(out iter);
-			this._model.set(iter, 0, pixbuf, 1, image_filepath, 2, stamp);
+			this._model.set(iter, 0, pixbuf, 1, image_filepath, 2, stamp, 3, true);
 		} catch (Error e) {
 			stderr.printf("%s\n", e.message);
 			return null;
@@ -56,16 +57,16 @@ public class ImageDataLists : GLib.Object {
 
 	public bool select(Gtk.TreeIter iter) {
 		var filepath = get_filepath(iter);
+		this._selected_pixbuf = null;
+		this._selected_filepath = filepath;
+
 		if (is_file_exists(filepath) == false) {
 			disable(iter);
-			this._selected_pixbuf   = null;
-			this._selected_filepath = "";
 			return false;
 		}
 
 		try {
-			this._selected_pixbuf   = new Gdk.Pixbuf.from_file(filepath);
-			this._selected_filepath = filepath;
+			this._selected_pixbuf = new Gdk.Pixbuf.from_file(filepath);
 
 			var cur_stamp = get_timestamp(filepath);
 			GLib.Value v_stamp;
@@ -74,6 +75,7 @@ public class ImageDataLists : GLib.Object {
 				refresh(iter);
 			}
 		} catch (Error e) {
+			disable(iter);
 			return false;
 		}
 		return true;
@@ -91,7 +93,7 @@ public class ImageDataLists : GLib.Object {
 			if (is_file_exists(filepath) == true) {
 				var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
 				var stamp = get_timestamp(filepath);
-				this._model.set(iter, 0, pixbuf, 2, stamp);
+				this._model.set(iter, 0, pixbuf, 2, stamp, 3, true);
 			}
 			else {
 				disable(iter);
@@ -103,7 +105,7 @@ public class ImageDataLists : GLib.Object {
 	}
 
 	public void disable(Gtk.TreeIter iter) {
-		if (unavailable_icon == null) {
+		if ((unavailable_icon == null) || (is_available(iter) == false)) {
 			return;
 		}
 
@@ -118,7 +120,7 @@ public class ImageDataLists : GLib.Object {
 
 		unavailable_icon.composite(pixbuf, 0, 0, dest_width, dest_height,
 								   dest_x, dest_y, 1, 1, Gdk.InterpType.NEAREST, 255);
-		this._model.set(iter, 0, pixbuf);
+		this._model.set(iter, 0, pixbuf, 3, false);
 	}
 
 	public string get_filepath(Gtk.TreeIter iter) {
@@ -126,6 +128,13 @@ public class ImageDataLists : GLib.Object {
 		this._model.get_value(iter, 1, out v_filepath);
 
 		return (string)v_filepath;
+	}
+
+	public bool is_available(Gtk.TreeIter iter) {
+		GLib.Value v_available;
+		this._model.get_value(iter, 3, out v_available);
+
+		return (bool)v_available;
 	}
 
 	private bool is_exist(string filepath, out Gtk.TreeIter? iter = null) {

@@ -69,8 +69,9 @@ public class ThumbnailFrame : Gtk.Frame {
 
 		// ファイル監視の設定
 		this.file_monitor = new ImageFileMonitor();
+		this.file_monitor.created.connect(on_file_changed);
 		this.file_monitor.changed.connect(on_file_changed);
-		this.file_monitor.removed.connect(on_file_removed);
+		this.file_monitor.removed.connect(on_file_changed);
 	}
 
 	public void select_item(Gtk.TreeIter? iter, bool force_update = false) {
@@ -84,14 +85,11 @@ public class ThumbnailFrame : Gtk.Frame {
 				this.iconview.scroll_to_path(path, false, 0, 0);
 				this.iconview.set_cursor(path, null, false);
 				this.iconview.select_path(path);
-
-				if (this.settings.auto_reload == true) {
-					this.file_monitor.set_filemonitor(this.image_lists.selected_filepath);
-				}
-				else {
-					this.file_monitor.reset_filemonitor();
-				}
 			}
+		}
+
+		if ((this.settings.auto_reload == true) && (iter != null)) {
+			this.file_monitor.set_filemonitor(this.image_lists.selected_filepath);
 		}
 		else {
 			this.file_monitor.reset_filemonitor();
@@ -165,16 +163,6 @@ public class ThumbnailFrame : Gtk.Frame {
 			Gtk.TreeIter? iter;
 			if (get_selected_iter(out iter) == true) {
 				this.image_lists.refresh(iter);
-				select_item(iter, true);
-			}
-		}
-	}
-
-	private void on_file_removed(string filepath) {
-		if (this.image_lists.selected_filepath == filepath) {
-			Gtk.TreeIter? iter;
-			if (get_selected_iter(out iter) == true) {
-				this.image_lists.disable(iter);
 				select_item(iter, true);
 			}
 		}
