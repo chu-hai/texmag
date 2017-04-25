@@ -56,19 +56,24 @@ public class ImageFileMonitor : GLib.Object {
 	}
 
 	private void on_filemonitor_changed(GLib.File file, GLib.File? other_file, GLib.FileMonitorEvent event_type) {
+		string filepath = file.get_path();
+		if (filepath != this.filepath) {
+			return;
+		}
+
 		switch (event_type) {
 		case GLib.FileMonitorEvent.CREATED:
-			this.created(this.filepath);
+			this.created(filepath);
 			break;
 
 		case GLib.FileMonitorEvent.CHANGED:
 		case GLib.FileMonitorEvent.ATTRIBUTE_CHANGED:
 		case GLib.FileMonitorEvent.CHANGES_DONE_HINT:
-			this.changed(this.filepath);
+			this.changed(filepath);
 			break;
 
 		case GLib.FileMonitorEvent.DELETED:
-			this.removed(this.filepath);
+			this.removed(filepath);
 			break;
 		}
 	}
