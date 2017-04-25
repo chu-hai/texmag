@@ -64,25 +64,25 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		// HeaderBarの設定
 		this.header = new Gtk.HeaderBar();
-		header.decoration_layout = ":close";
+		this.header.decoration_layout = ":close";
 		if (this.settings.set_titlebar) {
-			header.set_show_close_button(true);
-			header.title = this.title;
-			this.set_titlebar(header);
+			this.header.set_show_close_button(true);
+			this.header.title = this.title;
+			this.set_titlebar(this.header);
 		}
 		else {
-			header.title = "";
-			vbox_header.pack_start(header, false, false, 0);
+			this.header.title = "";
+			vbox_header.pack_start(this.header, false, false, 0);
 		}
 
 		// HeaderBarへボタンを登録
 		var btn_show_thumb = new Gtk.ToggleButton();
 		btn_show_thumb.image = new Gtk.Image.from_icon_name("view-list-symbolic", Gtk.IconSize.MENU);
 		btn_show_thumb.active = true;
-		header.pack_start(btn_show_thumb);
+		this.header.pack_start(btn_show_thumb);
 		var btn_option_menu = new Gtk.MenuButton();
 		btn_option_menu.image = new Gtk.Image.from_icon_name("emblem-system-symbolic", Gtk.IconSize.MENU);
-		header.pack_end(btn_option_menu);
+		this.header.pack_end(btn_option_menu);
 
 		// オプションメニューの設定
 		set_option_menu_widgets(btn_option_menu);
