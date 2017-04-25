@@ -107,12 +107,22 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		// 拡大エリアの設定
 		this.magnified_area = new Gtk.DrawingArea();
 		this.magnified_area.margin = 10;
+		this.magnified_area.can_focus = true;
+		this.magnified_area.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
 		var frame_magnified_area = new Gtk.Frame(null);
 		frame_magnified_area.add(this.magnified_area);
 		hbox_main.pack_start(frame_magnified_area, true, true, 0);
 
 		// シグナルハンドラの設定
 		this.magnified_area.draw.connect(on_magnified_area_draw);
+		this.magnified_area.button_press_event.connect((event) => {
+			this.magnified_area.has_focus = true;
+			return false;
+		});
+		this.magnified_area.key_press_event.connect((event) => {
+			return this.frame_thumb.iconview_key_press_event(event);
+		});
+
 		btn_show_thumb.toggled.connect(() => {
 			revealer_thumb.set_reveal_child(btn_show_thumb.active);
 		});

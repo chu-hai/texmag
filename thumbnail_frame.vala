@@ -116,6 +116,18 @@ public class ThumbnailFrame : Gtk.Frame {
 		return result;
 	}
 
+	public bool iconview_key_press_event(Gdk.EventKey event) {
+		Gtk.Widget? focused = this.window.get_focus();
+
+		this.iconview.has_focus = true;
+		var result = this.iconview.key_press_event(event);
+		if (focused != null) {
+			focused.has_focus = true;
+		}
+
+		return result;
+	}
+
 	private void on_open_clicked() {
 		var dialog = new ImageFileOpenDialog(this.window, this.mime_types);
 		dialog.select_multiple = true;
