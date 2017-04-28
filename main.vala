@@ -222,7 +222,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		int dest_height = this.magnified_area.get_allocated_height();
 		int dest_width  = this.magnified_area.get_allocated_width();
 
-		draw_scaled_image(context, this.image_lists.selected_pixbuf, dest_width, dest_height);
+		Utils.draw_scaled_image(context, this.image_lists.selected_pixbuf, dest_width, dest_height);
 		return true;
 	}
 }

@@ -44,7 +44,7 @@ public class ImageDataLists : GLib.Object {
 		}
 
 		try {
-			var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(image_filepath), ICON_SIZE, ICON_SIZE);
+			var pixbuf = Utils.get_scaled_pixbuf(new Gdk.Pixbuf.from_file(image_filepath), ICON_SIZE, ICON_SIZE);
 			var stamp = get_timestamp(image_filepath);
 			this._model.append(out iter);
 			this._model.set(iter, 0, pixbuf, 1, image_filepath, 2, stamp, 3, true);
@@ -60,7 +60,7 @@ public class ImageDataLists : GLib.Object {
 		this._selected_pixbuf = null;
 		this._selected_filepath = filepath;
 
-		if (is_file_exists(filepath) == false) {
+		if (Utils.is_file_exists(filepath) == false) {
 			disable(iter);
 			return false;
 		}
@@ -90,8 +90,8 @@ public class ImageDataLists : GLib.Object {
 	public bool refresh(Gtk.TreeIter iter) {
 		try {
 			string filepath = get_filepath(iter);
-			if (is_file_exists(filepath) == true) {
-				var pixbuf = get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
+			if (Utils.is_file_exists(filepath) == true) {
+				var pixbuf = Utils.get_scaled_pixbuf(new Gdk.Pixbuf.from_file(filepath), ICON_SIZE, ICON_SIZE);
 				var stamp = get_timestamp(filepath);
 				this._model.set(iter, 0, pixbuf, 2, stamp, 3, true);
 			}
