@@ -158,7 +158,7 @@ public class ThumbnailFrame : Gtk.Frame {
 				}
 			}
 
-			this.image_lists.remove(iter);
+			this.image_lists.remove(ref iter);
 			select_item(after_iter);
 		}
 	}

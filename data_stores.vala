@@ -81,10 +81,10 @@ public class ImageDataLists : GLib.Object {
 		return true;
 	}
 
-	public bool remove(Gtk.TreeIter iter) {
+	public bool remove(ref Gtk.TreeIter iter) {
 		this._selected_pixbuf   = null;
 		this._selected_filepath = "";
-		return this._model.remove(iter);
+		return this._model.remove(ref iter);
 	}
 
 	public bool refresh(Gtk.TreeIter iter) {
