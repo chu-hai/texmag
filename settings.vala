@@ -14,17 +14,17 @@
 //	クラス: 環境設定管理
 ////////////////////////////////////////////////////////////
 public class AppSettings : GLib.Object {
-	private	string	filepath;
-	private GLib.KeyFile keyfile;
+	private	string			filepath;
+	private GLib.KeyFile	keyfile;
 
 	public bool set_titlebar 	{ get; set; }
 	public bool auto_reload 	{ get; set; }
 	public bool always_on_top 	{ get; set; }
 
 	public class AppSettings() {
-		set_titlebar	= false;
-		auto_reload		= false;
-		always_on_top	= false;
+		this.set_titlebar	= false;
+		this.auto_reload	= false;
+		this.always_on_top	= false;
 
 		this.filepath = GLib.Path.build_filename(
 						GLib.Environment.get_user_config_dir(),
@@ -35,12 +35,13 @@ public class AppSettings : GLib.Object {
 		try {
 			this.keyfile.load_from_file(this.filepath, KeyFileFlags.KEEP_COMMENTS);
 		} catch (Error e) {
+			stderr.printf("Can't load configuration file: %s\n", e.message);
 			return;
 		}
 
-		set_titlebar  = get_boolean("settings", "set_titlebar",  set_titlebar);
-		auto_reload   = get_boolean("settings", "auto_reload",	 auto_reload);
-		always_on_top = get_boolean("settings", "always_on_top", always_on_top);
+		this.set_titlebar  = get_boolean("settings", "set_titlebar",  this.set_titlebar);
+		this.auto_reload   = get_boolean("settings", "auto_reload",	  this.auto_reload);
+		this.always_on_top = get_boolean("settings", "always_on_top", this.always_on_top);
 	}
 
 	public void save_setting() {
@@ -50,9 +51,9 @@ public class AppSettings : GLib.Object {
 			return;
 		}
 
-		this.keyfile.set_boolean("settings", "set_titlebar",  set_titlebar);
-		this.keyfile.set_boolean("settings", "auto_reload",	 auto_reload);
-		this.keyfile.set_boolean("settings", "always_on_top", always_on_top);
+		this.keyfile.set_boolean("settings", "set_titlebar",  this.set_titlebar);
+		this.keyfile.set_boolean("settings", "auto_reload",	  this.auto_reload);
+		this.keyfile.set_boolean("settings", "always_on_top", this.always_on_top);
 		try {
 			this.keyfile.save_to_file(this.filepath);
 		} catch (Error e) {
