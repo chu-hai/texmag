@@ -43,4 +43,9 @@ namespace Utils {
 	public bool is_file_exists(string filepath) {
 		return FileUtils.test(filepath, GLib.FileTest.EXISTS);
 	}
+
+	public void show_message(string message_text, MessageType message_type = MessageType.INFO) {
+		var message = MessageInterface.get_instance();
+		message.add_message(message_text, message_type);
+	}
 }

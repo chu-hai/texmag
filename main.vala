@@ -56,7 +56,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		vbox_header.pack_end(hbox_base, true, true, 0);
 
 		var hbox_main = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-		var revealer_info = new Gtk.Revealer();
+		var revealer_info = new MessageArea();
 		var overlay = new Gtk.Overlay();
 		overlay.add(hbox_main);
 		overlay.add_overlay(revealer_info);
@@ -83,18 +83,18 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		var btn_option_menu = new Gtk.MenuButton();
 		btn_option_menu.image = new Gtk.Image.from_icon_name("emblem-system-symbolic", Gtk.IconSize.MENU);
 		this.header.pack_end(btn_option_menu);
+		var btn_show_info = new Gtk.ToggleButton();
+		btn_show_info.image = new Gtk.Image.from_icon_name("emblem-important-symbolic", Gtk.IconSize.MENU);
+		this.header.pack_end(btn_show_info);
 
 		// オプションメニューの設定
 		set_option_menu_widgets(btn_option_menu);
 
-		// 情報エリアの設定
+		// メッセージエリアの設定
 		revealer_info.set_reveal_child(false);
 		revealer_info.set_transition_type(Gtk.RevealerTransitionType.SLIDE_UP);
 		revealer_info.halign = Gtk.Align.FILL;
 		revealer_info.valign = Gtk.Align.START;
-		var frame_info = new Gtk.Frame(null);
-		frame_info.get_style_context().add_class("app-notification");
-		revealer_info.add(frame_info);
 
 		// サムネイルフレームの設定
 		this.frame_thumb = new ThumbnailFrame(this, image_lists, mime_types, settings);
@@ -125,6 +125,10 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		btn_show_thumb.toggled.connect(() => {
 			revealer_thumb.set_reveal_child(btn_show_thumb.active);
+		});
+
+		btn_show_info.toggled.connect(() => {
+			revealer_info.set_reveal_child(btn_show_info.active);
 		});
 	}
 
@@ -248,6 +252,12 @@ public class TexMagApplication : Gtk.Application {
 
 	protected override void startup() {
 		base.startup();
+		var provider = new Gtk.CssProvider();
+		provider.load_from_resource(this.resource_base_path + "/resources/styles.css");
+		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),
+												 provider,
+												 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
 		this.window = new TexMagWindow(this, image_lists, mime_types, settings);
 		this.window.create_widgets();
 		this.window.show_all();
