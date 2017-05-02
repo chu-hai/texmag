@@ -1,20 +1,26 @@
 .info_frame {
 	color: #ffffff;
 	background-color: rgba(48, 48, 48, 0.6);
-    font-weight: bold;
+	font-weight: bold;
 	text-shadow: 1px 1px #000000;
 }
 
 .warning_frame {
 	color: #ffffff;
 	background-color: rgba(192, 192, 64, 0.6);
-    font-weight: bold;
+	font-weight: bold;
 	text-shadow: 1px 1px #000000;
 }
 
 .error_frame {
 	color: #ffffff;
 	background-color: rgba(192, 64, 64, 0.6);
-    font-weight: bold;
+	font-weight: bold;
 	text-shadow: 1px 1px #000000;
+}
+
+.message_counter {
+	color: #e0e0c0;
+	font-weight: bold;
+	font-size: 115%;
 }

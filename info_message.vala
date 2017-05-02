@@ -49,6 +49,7 @@ public class MessageArea : Gtk.Revealer {
 	private Gtk.Button	btn_clear;
 	private Gtk.Button	btn_prev;
 	private Gtk.Button	btn_next;
+	private Gtk.Label	counter;
 
 	public MessageArea() {
 		// 子ウィジェットの設定
@@ -59,10 +60,12 @@ public class MessageArea : Gtk.Revealer {
 		toolbar.opacity = 0.8;
 
 		var ti_clear   = new Gtk.ToolItem();
+		var ti_counter = new Gtk.ToolItem();
 		var ti_navi    = new Gtk.ToolItem();
 		this.btn_clear = new Gtk.Button.from_icon_name("user-trash-symbolic", Gtk.IconSize.BUTTON);
 		this.btn_prev  = new Gtk.Button.from_icon_name("go-previous-symbolic", Gtk.IconSize.BUTTON);
 		this.btn_next  = new Gtk.Button.from_icon_name("go-next-symbolic", Gtk.IconSize.BUTTON);
+		this.counter   = new Gtk.Label("0/0");
 		var sep_space  = new Gtk.SeparatorToolItem();
 		var hbox_infonavi = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		this.btn_clear.sensitive = false;
@@ -71,12 +74,16 @@ public class MessageArea : Gtk.Revealer {
 		hbox_infonavi.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED);
 		hbox_infonavi.pack_start(this.btn_prev, false, false, 0);
 		hbox_infonavi.pack_start(this.btn_next, false, false, 0);
+		counter.get_style_context().add_class("message_counter");
+		counter.margin_end = 16;
 		ti_clear.add(this.btn_clear);
 		ti_navi.add(hbox_infonavi);
+		ti_counter.add(this.counter);
 		sep_space.set_draw(false);
 		sep_space.set_expand(true);
 		toolbar.add(ti_clear);
 		toolbar.add(sep_space);
+		toolbar.add(ti_counter);
 		toolbar.add(ti_navi);
 
 		this.stack = new Gtk.Stack();
@@ -118,6 +125,7 @@ public class MessageArea : Gtk.Revealer {
 		sheet.get_style_context().add_class(class_string);
 		stack.add(sheet);
 		set_button_sensitivities();
+		set_message_count();
 	}
 
 	private void change_message(MessageArea.Direction dir) {
@@ -149,21 +157,31 @@ public class MessageArea : Gtk.Revealer {
 		}
 	}
 
+	private void set_message_count() {
+		GLib.List<weak Gtk.Widget> children = this.stack.get_children();
+		var total = (int)children.length();
+		var current = children.index(stack.visible_child) + 1;
+		this.counter.label = "%d/%d".printf(current, total);
+	}
+
 	private void on_clear_clicked() {
 		foreach (Gtk.Widget child in this.stack.get_children()) {
 			this.stack.remove(child);
 		}
 		set_button_sensitivities();
+		set_message_count();
 	}
 
 	private void on_prev_clicked() {
 		change_message(MessageArea.Direction.PREVIOUS);
 		set_button_sensitivities();
+		set_message_count();
 	}
 
 	private void on_next_clicked() {
 		change_message(MessageArea.Direction.NEXT);
 		set_button_sensitivities();
+		set_message_count();
 	}
 
 	////////////////////////////////////////////////////////////
