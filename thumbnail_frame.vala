@@ -185,7 +185,7 @@ public class ThumbnailFrame : Gtk.Frame {
 ////////////////////////////////////////////////////////////
 //	クラス: 画像ファイルオープンダイアログ
 ////////////////////////////////////////////////////////////
-private class ImageFileOpenDialog : GLib.Object {
+public class ImageFileOpenDialog : GLib.Object {
 	private Gtk.FileChooserDialog	dialog;
 
 	public bool select_multiple {
