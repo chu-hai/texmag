@@ -24,6 +24,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
 	private AppSettings			settings;
+	private ImageFileMonitor	file_monitor;
 
 	public TexMagWindow(Gtk.Application app,
 						ImageDataLists image_lists,
@@ -45,6 +46,12 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		} catch (Error e) {
 			stderr.printf ("Could not load application icon: %s\n", e.message);
 		}
+
+		// ファイル監視の設定
+		this.file_monitor = new ImageFileMonitor();
+		this.file_monitor.created.connect(on_file_changed);
+		this.file_monitor.changed.connect(on_file_changed);
+		this.file_monitor.removed.connect(on_file_changed);
 	}
 
 	public void create_widgets() {
@@ -186,7 +193,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 			Gtk.TreeIter? iter;
 			if (this.frame_thumb.get_selected_iter(out iter) == true) {
 				this.image_lists.refresh(iter);
-				this.frame_thumb.select_item(iter, true);
+				select_listitem(iter, true);
 			}
  		});
 		sw_set_titlebar.notify["active"].connect(() => {
@@ -194,15 +201,35 @@ public class TexMagWindow : Gtk.ApplicationWindow {
  		});
 	}
 
-	public void select_item(Gtk.TreeIter? iter) {
-		this.frame_thumb.select_item(iter);
+	public void select_listitem(Gtk.TreeIter? iter, bool force_update = false) {
+		if (iter != null) {
+			if ((this.image_lists.get_filepath(iter) == this.image_lists.selected_filepath)
+			&&  (force_update == false)) {
+				return;
+			}
+			if (this.image_lists.select(iter) == true) {
+				Gtk.TreePath path = this.image_lists.model.get_path(iter);
+				this.frame_thumb.iconview_select_path(path);
+			}
+		}
+
+		if ((this.settings.auto_reload == true) && (iter != null)) {
+			this.file_monitor.start_filemonitor(this.image_lists.selected_filepath);
+		}
+		else {
+			this.file_monitor.stop_filemonitor();
+		}
+
+		update_magnified_area();
+		update_title_string();
+		this.frame_thumb.update_button_sensitive();
 	}
 
-	public void update_magnified_area() {
+	private void update_magnified_area() {
 		this.magnified_area.queue_draw();
 	}
 
-	public void update_title_string() {
+	private void update_title_string() {
 		this.header.title    = DEFAULT_TITLE;
 		this.header.subtitle = null;
 
@@ -228,6 +255,16 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		Utils.draw_scaled_image(context, this.image_lists.selected_pixbuf, dest_width, dest_height);
 		return true;
+	}
+
+	private void on_file_changed(string filepath) {
+		if (this.image_lists.selected_filepath == filepath) {
+			Gtk.TreeIter? iter;
+			if (this.frame_thumb.get_selected_iter(out iter) == true) {
+				this.image_lists.refresh(iter);
+				select_listitem(iter, true);
+			}
+		}
 	}
 }
 
@@ -277,7 +314,7 @@ public class TexMagApplication : Gtk.Application {
 				this.image_lists.load_image(file.get_path());
 			}
 		}
-		this.window.select_item(iter);
+		this.window.select_listitem(iter);
 		this.window.present();
 	}
 

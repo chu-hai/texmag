@@ -22,7 +22,6 @@ public class ThumbnailFrame : Gtk.Frame {
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
 	private AppSettings			settings;
-	private ImageFileMonitor	file_monitor;
 
 	public ThumbnailFrame(TexMagWindow window,
 						  ImageDataLists image_lists,
@@ -66,44 +65,12 @@ public class ThumbnailFrame : Gtk.Frame {
 		btn_open.clicked.connect(on_open_clicked);
 		this.btn_remove.clicked.connect(on_remove_clicked);
 		this.iconview.selection_changed.connect(on_selection_changed);
-
-		// ファイル監視の設定
-		this.file_monitor = new ImageFileMonitor();
-		this.file_monitor.created.connect(on_file_changed);
-		this.file_monitor.changed.connect(on_file_changed);
-		this.file_monitor.removed.connect(on_file_changed);
 	}
 
-	public void select_item(Gtk.TreeIter? iter, bool force_update = false) {
-		if (iter != null) {
-			if ((this.image_lists.get_filepath(iter) == this.image_lists.selected_filepath)
-			&&  (force_update == false)) {
-				return;
-			}
-			if (this.image_lists.select(iter) == true) {
-				Gtk.TreePath path = this.image_lists.model.get_path(iter);
-				this.iconview.scroll_to_path(path, false, 0, 0);
-				this.iconview.set_cursor(path, null, false);
-				this.iconview.select_path(path);
-			}
-		}
-
-		if ((this.settings.auto_reload == true) && (iter != null)) {
-			this.file_monitor.start_filemonitor(this.image_lists.selected_filepath);
-		}
-		else {
-			this.file_monitor.stop_filemonitor();
-		}
-
-		this.window.update_magnified_area();
-		this.window.update_title_string();
-
-		if (this.image_lists.model.iter_n_children(null) == 0) {
-			this.btn_remove.sensitive = false;
-		}
-		else {
-			this.btn_remove.sensitive = true;
-		}
+	public void iconview_select_path(Gtk.TreePath path) {
+		this.iconview.scroll_to_path(path, false, 0, 0);
+		this.iconview.set_cursor(path, null, false);
+		this.iconview.select_path(path);
 	}
 
 	public bool get_selected_iter(out Gtk.TreeIter? iter) {
@@ -114,6 +81,15 @@ public class ThumbnailFrame : Gtk.Frame {
 			result = this.image_lists.model.get_iter(out iter, path);
 		}
 		return result;
+	}
+
+	public void update_button_sensitive() {
+		if (this.image_lists.model.iter_n_children(null) == 0) {
+			this.btn_remove.sensitive = false;
+		}
+		else {
+			this.btn_remove.sensitive = true;
+		}
 	}
 
 	public bool iconview_key_press_event(Gdk.EventKey event) {
@@ -142,7 +118,7 @@ public class ThumbnailFrame : Gtk.Frame {
 					this.image_lists.load_image(file);
 				}
 			}
-			select_item(iter);
+			this.window.select_listitem(iter);
 		}
 	}
 
@@ -159,24 +135,14 @@ public class ThumbnailFrame : Gtk.Frame {
 			}
 
 			this.image_lists.remove(ref iter);
-			select_item(after_iter);
+			this.window.select_listitem(after_iter);
 		}
 	}
 
 	private void on_selection_changed() {
 		Gtk.TreeIter? iter;
 		if (get_selected_iter(out iter) == true) {
-			select_item(iter);
-		}
-	}
-
-	private void on_file_changed(string filepath) {
-		if (this.image_lists.selected_filepath == filepath) {
-			Gtk.TreeIter? iter;
-			if (get_selected_iter(out iter) == true) {
-				this.image_lists.refresh(iter);
-				select_item(iter, true);
-			}
+			this.window.select_listitem(iter);
 		}
 	}
 }
