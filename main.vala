@@ -20,6 +20,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 	private Gtk.HeaderBar		header;
 	private ThumbnailFrame		frame_thumb;
+	private SmallMagnifiedArea	small_area;
 	private Gtk.DrawingArea		magnified_area;
 	private ImageDataLists		image_lists;
 	private SupportedMimeTypes	mime_types;
@@ -87,6 +88,10 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		btn_show_thumb.image = new Gtk.Image.from_icon_name("view-list-symbolic", Gtk.IconSize.MENU);
 		btn_show_thumb.active = true;
 		this.header.pack_start(btn_show_thumb);
+		var btn_show_small = new Gtk.ToggleButton();
+		btn_show_small.image = new Gtk.Image.from_icon_name("view-paged-symbolic", Gtk.IconSize.MENU);
+		btn_show_small.active = true;
+		this.header.pack_start(btn_show_small);
 		var btn_option_menu = new Gtk.MenuButton();
 		btn_option_menu.image = new Gtk.Image.from_icon_name("emblem-system-symbolic", Gtk.IconSize.MENU);
 		this.header.pack_end(btn_option_menu);
@@ -111,6 +116,14 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 		revealer_thumb.add(this.frame_thumb);
 		hbox_base.pack_start(revealer_thumb, false, false, 0);
 
+		// 小型拡大エリアの設定
+		this.small_area = new SmallMagnifiedArea(this, image_lists);
+		var revealer_small = new Gtk.Revealer();
+		revealer_small.set_reveal_child(true);
+		revealer_small.set_transition_type(Gtk.RevealerTransitionType.SLIDE_LEFT);
+		revealer_small.add(this.small_area);
+		hbox_base.pack_start(revealer_small, false, false, 0);
+
 		// 拡大エリアの設定
 		this.magnified_area = new Gtk.DrawingArea();
 		this.magnified_area.margin = 10;
@@ -132,6 +145,10 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 		btn_show_thumb.toggled.connect(() => {
 			revealer_thumb.set_reveal_child(btn_show_thumb.active);
+		});
+
+		btn_show_small.toggled.connect(() => {
+			revealer_small.set_reveal_child(btn_show_small.active);
 		});
 
 		btn_show_info.toggled.connect(() => {
@@ -227,6 +244,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 
 	private void update_magnified_area() {
 		this.magnified_area.queue_draw();
+		this.small_area.draw_small_image();
 	}
 
 	private void update_title_string() {
