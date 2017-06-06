@@ -192,7 +192,8 @@ public class MessageArea : Gtk.Revealer {
 
 		public MessageSheet(string text) {
 			this.message_text = new Gtk.Label(text);
-			this.message_text.set_ellipsize(Pango.EllipsizeMode.END);
+			this.message_text.wrap = true;
+			this.message_text.wrap_mode = Pango.WrapMode.CHAR;
 			this.message_text.tooltip_text = text;
 			this.message_text.set_use_markup(true);
 			this.message_text.halign = Gtk.Align.START;
