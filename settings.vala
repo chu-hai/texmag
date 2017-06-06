@@ -35,7 +35,7 @@ public class AppSettings : GLib.Object {
 		try {
 			this.keyfile.load_from_file(this.filepath, KeyFileFlags.KEEP_COMMENTS);
 		} catch (Error e) {
-			stderr.printf("Can't load configuration file: %s\n", e.message);
+			warning("Could not load configuration file: %s", e.message);
 			return;
 		}
 
@@ -47,7 +47,7 @@ public class AppSettings : GLib.Object {
 	public void save_setting() {
 		var dir_name = GLib.Path.get_dirname(this.filepath);
 		if (DirUtils.create_with_parents(dir_name, 0777) != 0) {
-			stderr.printf("Can't create directory: [%s] %s\n", dir_name, GLib.strerror(GLib.errno));
+			warning("Could not create directory: [%s] %s", dir_name, GLib.strerror(GLib.errno));
 			return;
 		}
 
@@ -57,7 +57,7 @@ public class AppSettings : GLib.Object {
 		try {
 			this.keyfile.save_to_file(this.filepath);
 		} catch (Error e) {
-			stderr.printf("Can't save configuration file: %s\n", e.message);
+			warning("Could not save configuration file: %s", e.message);
 		}
 	}
 

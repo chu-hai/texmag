@@ -49,7 +49,7 @@ public class ImageDataLists : GLib.Object {
 			this._model.append(out iter);
 			this._model.set(iter, 0, pixbuf, 1, image_filepath, 2, stamp, 3, true);
 		} catch (Error e) {
-			stderr.printf("%s\n", e.message);
+			Utils.show_message("%s".printf(e.message), MessageType.ERROR);
 			return null;
 		}
 		return iter;
@@ -168,7 +168,7 @@ public class ImageDataLists : GLib.Object {
 				result = mod_time.to_iso8601();
 			}
 		} catch (Error e) {
-			stderr.printf ("Error: %s\n", e.message);
+			warning("Failed to get timestamp: %s", e.message);
 		}
 		return result;
 	}

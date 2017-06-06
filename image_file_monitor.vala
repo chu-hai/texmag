@@ -42,7 +42,7 @@ public class ImageFileMonitor : GLib.Object {
 			this.file_monitor = GLib.File.new_for_path(this.filepath).monitor(GLib.FileMonitorFlags.NONE, null);
 			this.file_monitor.changed.connect(on_filemonitor_changed);
 		} catch (Error e) {
-			stderr.printf("Error: %s\n", e.message);
+			warning("File monitoring failed to start: %s", e.message);
 		}
 	}
 

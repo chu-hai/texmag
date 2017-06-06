@@ -45,7 +45,7 @@ public class TexMagWindow : Gtk.ApplicationWindow {
 			this.icon = new Gdk.Pixbuf.from_resource(app.resource_base_path + "/resources/appli_icon.png");
 			this.image_lists.set_unavailable_icon(new Gdk.Pixbuf.from_resource(app.resource_base_path + "/resources/unavailable_image.png"));
 		} catch (Error e) {
-			stderr.printf ("Could not load application icon: %s\n", e.message);
+			warning("Could not load icon file: %s", e.message);
 		}
 
 		// ファイル監視の設定
