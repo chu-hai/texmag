@@ -1,6 +1,7 @@
 PROGRAM   = texmag
 SOURCES   = main.vala data_stores.vala thumbnail_frame.vala utils.vala settings.vala \
-			image_file_monitor.vala info_message.vala small_magnified_area.vala
+			image_file_monitor.vala info_message.vala small_magnified_area.vala \
+			thumbnail_menu.vala
 RESOURCES = resources.xml
 PKGS      = glib-2.0 gobject-2.0 gtk+-3.0 gio-2.0
 VALAFLAGS =

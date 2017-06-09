@@ -61,6 +61,15 @@ public class ThumbnailFrame : Gtk.Frame {
 		hbox_footer_inner.pack_start(btn_open, false, false, 0);
 		hbox_footer_inner.pack_start(this.btn_remove, false, false, 0);
 
+		var btn_menu    = new Gtk.MenuButton();
+		btn_menu.image = new Gtk.Image.from_icon_name("open-menu-symbolic", Gtk.IconSize.MENU);
+		hbox_footer.pack_end(btn_menu, false, false, 5);
+		var menu = new ThumbnailMenu(window, this, btn_menu, image_lists);
+		var popover = new Gtk.PopoverMenu();
+		popover.add(menu);
+		menu.show_all();
+		btn_menu.set_popover(popover);
+
 		// シグナルハンドラの設定
 		btn_open.clicked.connect(on_open_clicked);
 		this.btn_remove.clicked.connect(on_remove_clicked);
