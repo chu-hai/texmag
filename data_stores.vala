@@ -110,6 +110,13 @@ public class ImageDataLists : GLib.Object {
 		return true;
 	}
 
+	public void refresh_all() {
+		this._model.foreach((_model, _path, _iter) => {
+			refresh(_iter);
+			return false;
+		});
+	}
+
 	public void disable(Gtk.TreeIter iter) {
 		if ((unavailable_icon == null) || (is_available(iter) == false)) {
 			return;

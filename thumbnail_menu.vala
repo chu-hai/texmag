@@ -17,6 +17,7 @@ public class ThumbnailMenu : Gtk.Frame {
 	private TexMagWindow	window;
 	private ThumbnailFrame	frame_thumb;
 	private ImageDataLists	image_lists;
+	private Gtk.ModelButton	btn_refresh;
 	private Gtk.ModelButton	btn_clear;
 
 	public ThumbnailMenu(TexMagWindow window,
@@ -37,13 +38,17 @@ public class ThumbnailMenu : Gtk.Frame {
 		this.add(vbox_menu);
 
 		// 各種メニュー項目の生成
+		this.btn_refresh = new Gtk.ModelButton();
+		btn_refresh.text = "Refresh";
 		this.btn_clear = new Gtk.ModelButton();
 		btn_clear.text = "Clear";
 
-		vbox_menu.pack_start(this.btn_clear, false, false, 3);
+		vbox_menu.pack_start(this.btn_refresh,	false, false, 3);
+		vbox_menu.pack_start(this.btn_clear,	false, false, 3);
 
 		// シグナルハンドラの設定
 		parent.toggled.connect(update_menu_sensitive);
+		this.btn_refresh.clicked.connect(on_refresh_clicked);
 		this.btn_clear.clicked.connect(on_clear_clicked);
 	}
 
@@ -52,7 +57,12 @@ public class ThumbnailMenu : Gtk.Frame {
 		if (this.image_lists.model.iter_n_children(null) == 0) {
 			sensitive = false;
 		}
-		this.btn_clear.sensitive = sensitive;
+		this.btn_refresh.sensitive	= sensitive;
+		this.btn_clear.sensitive	= sensitive;
+	}
+
+	private void on_refresh_clicked() {
+		this.frame_thumb.iconview_refresh();
 	}
 
 	private void on_clear_clicked() {

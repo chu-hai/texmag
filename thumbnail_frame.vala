@@ -90,6 +90,14 @@ public class ThumbnailFrame : Gtk.Frame {
 		this.iconview.model = this.image_lists.model;
 	}
 
+	public void iconview_refresh() {
+		Gtk.TreeIter? iter;
+		this.image_lists.refresh_all();
+		if (get_selected_iter(out iter) == true) {
+			this.window.select_listitem(iter, true);
+		}
+	}
+
 	public bool get_selected_iter(out Gtk.TreeIter? iter) {
 		bool result = false;
 		iter = null;
