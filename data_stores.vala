@@ -87,6 +87,12 @@ public class ImageDataLists : GLib.Object {
 		return this._model.remove(ref iter);
 	}
 
+	public void clear() {
+		this._selected_pixbuf   = null;
+		this._selected_filepath = "";
+		this._model.clear();
+	}
+
 	public bool refresh(Gtk.TreeIter iter) {
 		try {
 			string filepath = get_filepath(iter);

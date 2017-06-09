@@ -82,6 +82,14 @@ public class ThumbnailFrame : Gtk.Frame {
 		this.iconview.select_path(path);
 	}
 
+	public void iconview_clear() {
+		this.image_lists.clear();
+
+		// スクロールバーをリセットするためにmodelを再設定する
+		this.iconview.model = null;
+		this.iconview.model = this.image_lists.model;
+	}
+
 	public bool get_selected_iter(out Gtk.TreeIter? iter) {
 		bool result = false;
 		iter = null;
