@@ -133,9 +133,8 @@ public class ThumbnailFrame : Gtk.Frame {
 		var dialog = new ImageFileOpenDialog(this.window, this.mime_types);
 		dialog.select_multiple = true;
 		if (dialog.show() == Gtk.ResponseType.ACCEPT) {
-			SList<string> files = dialog.get_filenames();
 			Gtk.TreeIter? iter = null;
-			foreach (string file in files) {
+			foreach (string file in dialog.filenames) {
 				if (iter == null) {
 					iter = this.image_lists.load_image(file);
 				}
@@ -169,46 +168,5 @@ public class ThumbnailFrame : Gtk.Frame {
 		if (get_selected_iter(out iter) == true) {
 			this.window.select_listitem(iter);
 		}
-	}
-}
-
-
-////////////////////////////////////////////////////////////
-//	クラス: 画像ファイルオープンダイアログ
-////////////////////////////////////////////////////////////
-public class ImageFileOpenDialog : GLib.Object {
-	private Gtk.FileChooserDialog	dialog;
-
-	public bool select_multiple {
-		set { this.dialog.select_multiple = value; }
-		get { return this.dialog.select_multiple; }
-	}
-
-	public ImageFileOpenDialog(Gtk.Window parent, SupportedMimeTypes mime_types) {
-		// ファイル選択ダイアログの設定
-		this.dialog = new Gtk.FileChooserDialog("Open Image Files",
-											    parent,
-											    Gtk.FileChooserAction.OPEN,
-											    "_Cancel", Gtk.ResponseType.CANCEL,
-											    "_Open", Gtk.ResponseType.ACCEPT);
-		this.dialog.local_only = true;
-
-		// フィルタの設定
-		var filter = new Gtk.FileFilter();
-		filter.set_filter_name("Image Files");
-		foreach (string mime_type in mime_types.get_all()) {
-			filter.add_mime_type(mime_type);
-		}
-		this.dialog.set_filter(filter);
-	}
-
-	public int show() {
-		var result = this.dialog.run();
-		this.dialog.close();
-		return result;
-	}
-
-	public SList<string> get_filenames() {
-		return this.dialog.get_filenames();
 	}
 }
