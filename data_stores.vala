@@ -206,8 +206,8 @@ public class SupportedMimeTypes: GLib.Object {
 		}
 	}
 
-	public bool is_supported(string mine_type) {
-		return this.format_lists.lookup(mine_type) != null;
+	public bool is_supported(string mime_type) {
+		return this.format_lists.lookup(mime_type) != null;
 	}
 
 	public string[] get_all() {

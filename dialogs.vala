@@ -25,8 +25,8 @@ public class OpenDialogBase : GLib.Object {
 
 	protected OpenDialogBase(string? title, Gtk.Window parent, Gtk.FileChooserAction action) {
 		this.dialog = new Gtk.FileChooserDialog(title, parent, action,
-											    "_Cancel", Gtk.ResponseType.CANCEL,
-											    "_Open", Gtk.ResponseType.ACCEPT);
+												"_Cancel", Gtk.ResponseType.CANCEL,
+												"_Open", Gtk.ResponseType.ACCEPT);
 		this.dialog.local_only = true;
 	}
 

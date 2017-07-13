@@ -20,16 +20,16 @@ public class MessageInterface : GLib.Object {
 
 	public signal void add(string message_text, MessageType message_type);
 
-    private static MessageInterface? instance = null;
+	private static MessageInterface? instance = null;
 
-    private MessageInterface() {}
+	private MessageInterface() {}
 
-    public static MessageInterface get_instance() {
-        if (instance == null) {
-            instance = new MessageInterface();
-        }
-        return instance;
-    }
+	public static MessageInterface get_instance() {
+		if (instance == null) {
+			instance = new MessageInterface();
+		}
+		return instance;
+	}
 
 	public void add_message(string message_text, MessageType message_type) {
 		this.add(message_text, message_type);
