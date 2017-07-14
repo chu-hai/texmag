@@ -323,16 +323,35 @@ public class TexMagApplication : Gtk.Application {
 	}
 
 	protected override void open(File[] files, string hint) {
-		Gtk.TreeIter? iter = null;
+		int	success = 0;
+		int	failure = 0;
+		Gtk.TreeIter? first_iter = null;
 		foreach (GLib.File file in files) {
-			if (iter == null) {
-				iter = this.image_lists.load_image(file.get_path());
+			Gtk.TreeIter? temp_iter = null;
+			if (mime_types.is_supported(Utils.get_mime_type(file.get_path())) == false) {
+				failure++;
+				continue;
+			}
+
+			temp_iter = this.image_lists.load_image(file.get_path());
+			if (temp_iter != null) {
+				if (first_iter == null) {
+					first_iter = temp_iter;
+				}
+				success++;
 			}
 			else {
-				this.image_lists.load_image(file.get_path());
+				failure++;
 			}
 		}
-		this.window.select_listitem(iter);
+		if (success > 0) {
+			Utils.show_message("%d file(s) loaded.".printf(success));
+		}
+		if (failure > 0) {
+			Utils.show_message("Failed to load %d file(s).".printf(failure), MessageType.WARNING);
+		}
+
+		this.window.select_listitem(first_iter);
 		this.window.present();
 	}
 

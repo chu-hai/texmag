@@ -44,6 +44,18 @@ namespace Utils {
 		return FileUtils.test(filepath, GLib.FileTest.EXISTS);
 	}
 
+	public string get_mime_type(string filepath) {
+		string result = "";
+		try {
+			var file = GLib.File.new_for_path(filepath);
+			var info = file.query_info("standard::content-type", 0, null);
+			result = info.get_content_type();
+		} catch (Error e) {
+			return "";
+		}
+		return result;
+	}
+
 	public void show_message(string message_text, MessageType message_type = MessageType.INFO) {
 		var message = MessageInterface.get_instance();
 		message.add_message(message_text, message_type);

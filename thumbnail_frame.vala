@@ -133,16 +133,35 @@ public class ThumbnailFrame : Gtk.Frame {
 		var dialog = new ImageFileOpenDialog(this.window, this.mime_types);
 		dialog.select_multiple = true;
 		if (dialog.show() == Gtk.ResponseType.ACCEPT) {
-			Gtk.TreeIter? iter = null;
-			foreach (string file in dialog.filenames) {
-				if (iter == null) {
-					iter = this.image_lists.load_image(file);
+			int	success = 0;
+			int	failure = 0;
+			Gtk.TreeIter? first_iter = null;
+			foreach (string filepath in dialog.filenames) {
+				Gtk.TreeIter? temp_iter = null;
+				if (mime_types.is_supported(Utils.get_mime_type(filepath)) == false) {
+					failure++;
+					continue;
+				}
+
+				temp_iter = this.image_lists.load_image(filepath);
+				if (temp_iter != null) {
+					if (first_iter == null) {
+						first_iter = temp_iter;
+					}
+					success++;
 				}
 				else {
-					this.image_lists.load_image(file);
+					failure++;
 				}
 			}
-			this.window.select_listitem(iter);
+			if (success > 0) {
+				Utils.show_message("%d file(s) loaded.".printf(success));
+			}
+			if (failure > 0) {
+				Utils.show_message("Failed to load %d file(s).".printf(failure), MessageType.WARNING);
+			}
+
+			this.window.select_listitem(first_iter);
 		}
 	}
 
