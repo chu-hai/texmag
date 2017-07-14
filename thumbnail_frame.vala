@@ -161,7 +161,7 @@ public class ThumbnailFrame : Gtk.Frame {
 				Utils.show_message("Failed to load %d file(s).".printf(failure), MessageType.WARNING);
 			}
 
-			this.window.select_listitem(first_iter);
+			this.window.select_listitem(first_iter, true);
 		}
 	}
 
