@@ -64,7 +64,7 @@ public class ThumbnailFrame : Gtk.Frame {
 		var btn_menu    = new Gtk.MenuButton();
 		btn_menu.image = new Gtk.Image.from_icon_name("open-menu-symbolic", Gtk.IconSize.MENU);
 		hbox_footer.pack_end(btn_menu, false, false, 5);
-		var menu = new ThumbnailMenu(window, this, btn_menu, image_lists);
+		var menu = new ThumbnailMenu(window, this, btn_menu, image_lists, mime_types);
 		var popover = new Gtk.PopoverMenu();
 		popover.add(menu);
 		menu.show_all();

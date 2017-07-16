@@ -58,3 +58,17 @@ public class ImageFileOpenDialog : OpenDialogBase {
 		this.dialog.set_filter(filter);
 	}
 }
+
+
+//	フォルダオープンダイアログ
+public class FolderOpenDialog : OpenDialogBase {
+	private string _foldername;
+	public string foldername {
+		get { _foldername = this.dialog.get_filename(); return _foldername; }
+	}
+
+	public FolderOpenDialog(Gtk.Window parent) {
+		// フォルダオープンダイアログの設定
+		base("Open Folder", parent, Gtk.FileChooserAction.SELECT_FOLDER);
+	}
+}
